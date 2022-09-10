@@ -18,8 +18,8 @@ public class Grabber extends Mechanism{
 
     @Override
     public void init(HardwareMap hwMap) {
-        left = hwMap.crservo.get("");
-        right = hwMap.crservo.get("");
+        left = hwMap.crservo.get("left");
+        right = hwMap.crservo.get("right");
     }
 
     public void run(){
