@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Config
 public class Claw extends Mechanism{
     //0.3 for claws
-    
+
     public static double leftClamp = 0.0;
     public static double leftUnclamp = 1.0;
 
