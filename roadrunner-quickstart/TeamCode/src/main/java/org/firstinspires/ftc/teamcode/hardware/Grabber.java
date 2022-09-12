@@ -20,6 +20,7 @@ public class Grabber extends Mechanism{
     public void init(HardwareMap hwMap) {
         left = hwMap.crservo.get("left");
         right = hwMap.crservo.get("right");
+
     }
 
     public void run(){

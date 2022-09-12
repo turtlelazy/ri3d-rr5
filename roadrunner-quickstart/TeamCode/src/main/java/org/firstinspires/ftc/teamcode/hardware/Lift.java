@@ -20,11 +20,10 @@ public class Lift extends Mechanism{
     private DcMotor liftLeft;
     private DcMotor liftRight;
 
-    private TouchSensor limitSwitch;
     private boolean useLimitSwitch = false;
 
     //retract logic for handling coefficient of gravity. Not needed if utilizing kF
-    private boolean retract = true;
+    private boolean retract = false;
 
     public static double retMult = 0.0;
     public boolean fullSend = false;
@@ -32,17 +31,17 @@ public class Lift extends Mechanism{
     public static double HEIGHT_INCREMENT = 1.5;
 
     // saved lift positions
-    public static double maxPos = 14; //highest position slides can reach
+    public static double maxPos = 19; //highest position slides can reach
     public static double midPos = 7.0; //mid goal position
     public static double midPosTele = 4.5; //mid goal position
 
     public static double minPos = 0; //lowest position slides can reach (default to 0)
 
     //PIDCoefficients for RoadRunner motion profiling
-    public static PIDCoefficients coeffsUp = new PIDCoefficients(0.1, 0, 0);
+    public static PIDCoefficients coeffsUp = new PIDCoefficients(0.3, 0, 0);
     public static PIDCoefficients coeffsDown = new PIDCoefficients(0.1, 0, 0);
 
-    public static double kF = 0.12; //min power to go against g
+    public static double kF = 0.0; //min power to go against g
 
     //two controllers because we have two motors (although in theory it is possible to utilize only one
     PIDFController upwardsControl;
@@ -52,9 +51,9 @@ public class Lift extends Mechanism{
     public static double downwardsAccel = 1;
 
     // lift constants
-    public static double SPOOL_DIAMETER_IN = 1.81102;
-    public static double MOTOR_RATIO = 5.2;
-    public static double TICKS_PER_REV = 145.1;
+    public static double SPOOL_DIAMETER_IN = 1.1;
+    public static double MOTOR_RATIO = 18.2;
+    public static double TICKS_PER_REV = 537.7;
     public static double GEAR_RATIO = 1.0;
 
     public static double[] positionHistory = new double[]{10};
@@ -65,11 +64,10 @@ public class Lift extends Mechanism{
     public void init(HardwareMap hardwareMap) {
         liftLeft = hardwareMap.get(DcMotor.class, "liftLeft");
         liftRight = hardwareMap.get(DcMotor.class, "liftRight");
-        limitSwitch = hardwareMap.touchSensor.get("limitSwitch");
         // if you need to make sure to reverse as necessary
 
 //        liftLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        liftRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        liftLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //makes sure the motors don't move at zero power
         liftLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -92,7 +90,7 @@ public class Lift extends Mechanism{
          */
 
         upwardsControl = new PIDFController(coeffsUp, 0, 0, 0, (x,v) -> kF);
-        downwardsControl = new PIDFController(coeffsDown, 0, 0, 0);//, (x,v) -> kF);
+        downwardsControl = new PIDFController(coeffsUp, 0, 0, 0);//, (x,v) -> kF);
 
         /*
          * Part of gravity logic. Not needed if utilizing kF
@@ -172,9 +170,7 @@ public class Lift extends Mechanism{
         if (positionHistory.length - 1 - 1 >= 0)
             System.arraycopy(positionHistory, 2, positionHistory, 1, positionHistory.length - 1 - 1);
 
-        if (limitSwitch.isPressed() && useLimitSwitch) {
-            reset();
-        }
+
     }
 
     /**
@@ -297,8 +293,5 @@ public class Lift extends Mechanism{
         liftRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    public boolean touchSensor(){
-        return limitSwitch.isPressed();
-    }
 
 }
